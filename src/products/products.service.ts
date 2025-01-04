@@ -55,7 +55,15 @@ export class ProductsService {
       return product;
     } catch (error) {
       console.log(error);
-      throw new HttpException('erro na solicitação', HttpStatus.BAD_REQUEST);
+      // Se o erro já for uma instância de HttpException
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      // Caso contrário, um erro genérico.
+      throw new HttpException(
+        'Erro na solicitação',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -71,7 +79,7 @@ export class ProductsService {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           throw new HttpException(
-            'O produto com esse nome já existe',
+            'Um produto com esse nome já existe',
             HttpStatus.BAD_REQUEST,
           );
         }
